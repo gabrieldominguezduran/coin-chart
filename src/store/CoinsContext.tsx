@@ -1,6 +1,10 @@
 import * as React from "react";
-import Coin from "../models/coin";
+import appContext from "../models/appContext";
 
-const CoinsContext = React.createContext<Coin[]>([]);
+const CoinsContext = React.createContext<appContext>({
+  coins: [],
+  // addCoin: () => {},
+  removeCoin: (name: string) => {},
+});
 
 export default CoinsContext;

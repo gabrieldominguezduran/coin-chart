@@ -8,6 +8,7 @@ import SideNav from "./components/SideNav";
 
 import Coin from "./models/coin";
 import CoinsContext from "./store/CoinsContext";
+import appContext from "./models/appContext";
 
 function App() {
   const [coins, setCoins] = React.useState<Coin[]>([]);
@@ -17,7 +18,7 @@ function App() {
   const fetchCoins = async () => {
     try {
       const response = await fetch(
-        `https://api.coinstats.app/public/v1/coins?skip=0&limit=15&currency=EUR`
+        `https://api.coinstats.app/public/v1/coins?skip=0&limit=5&currency=EUR`
       );
       const data = await response.json();
       setCoins(data.coins);
@@ -26,8 +27,19 @@ function App() {
     }
   };
 
+  const handleRemoveCoin = (name: string) => {
+    setCoins((prevCoin) => {
+      return prevCoin.filter((coin) => coin.name !== name);
+    });
+  };
+
+  const appCtx: appContext = {
+    coins: coins,
+    removeCoin: handleRemoveCoin,
+  };
+
   return (
-    <CoinsContext.Provider value={coins}>
+    <CoinsContext.Provider value={appCtx}>
       <BrowserRouter>
         <SideNav />
         <Routes>

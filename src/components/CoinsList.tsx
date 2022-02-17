@@ -45,18 +45,18 @@ import Coin from "../models/coin";
 function createData(
   // availableSupply: number,
   // exp: string[],
-  // icon: string,
+  icon: string,
   // id: string,
   name: string,
   priceChange1d: number,
   price: number,
   priceBtc: number,
   marketCap: number,
-  volume: number
+  volume: number,
   // priceChange1h: number,
   // priceChange1w: number,
   // rank: number,
-  // symbol: string
+  symbol: string
   // totalSupply: number,
   // twitterUrl: string,
   // websiteUrl: string,
@@ -64,7 +64,7 @@ function createData(
   return {
     // availableSupply,
     // exp,
-    // icon,
+    icon,
     // id,
     name,
     priceChange1d,
@@ -75,7 +75,7 @@ function createData(
     // priceChange1h,
     // priceChange1w,
     // rank,
-    // symbol,
+    symbol,
     // totalSupply,
     // twitterUrl,
     // websiteUrl,
@@ -147,7 +147,7 @@ const headCells: readonly HeadCell[] = [
     id: "price",
     numeric: true,
     disablePadding: false,
-    label: "PRICE",
+    label: "PRICE €",
   },
   {
     id: "priceBtc",
@@ -205,7 +205,7 @@ function EnhancedTableHead(props: EnhancedTableProps) {
             checked={rowCount > 0 && numSelected === rowCount}
             onChange={onSelectAllClick}
             inputProps={{
-              "aria-label": "select all desserts",
+              "aria-label": "select all coins",
             }}
           />
         </TableCell>
@@ -238,6 +238,10 @@ function EnhancedTableHead(props: EnhancedTableProps) {
 interface EnhancedTableToolbarProps {
   numSelected: number;
 }
+
+const handleDelete = (name: string): void => {
+  console.log(name);
+};
 
 const EnhancedTableToolbar = (props: EnhancedTableToolbarProps) => {
   const { numSelected } = props;
@@ -272,17 +276,17 @@ const EnhancedTableToolbar = (props: EnhancedTableToolbarProps) => {
           id="tableTitle"
           component="div"
         >
-          Nutrition
+          Coin's
         </Typography>
       )}
       {numSelected > 0 ? (
         <>
-          <Tooltip title="Add">
+          <Tooltip title="Add to chart">
             <IconButton>
               <AddCircleIcon />
             </IconButton>
           </Tooltip>
-          <Tooltip title="Delete">
+          <Tooltip title="Delete row">
             <IconButton>
               <DeleteIcon />
             </IconButton>
@@ -305,17 +309,18 @@ export default function CoinList() {
   const [selected, setSelected] = React.useState<readonly string[]>([]);
   const [page, setPage] = React.useState(0);
   const [rowsPerPage, setRowsPerPage] = React.useState(5);
-  const coins = React.useContext(CoinsContext);
-  console.log(coins);
+  const { coins, removeCoin } = React.useContext(CoinsContext);
 
   const rows = coins.map((coin) => {
     return createData(
+      coin.icon,
       coin.name,
       coin.priceChange1d,
       Number(coin.price.toFixed(2)),
       Number(coin.priceBtc.toFixed(4)),
       Number(coin.marketCap.toFixed(2)),
-      Number(coin.volume.toFixed(2))
+      Number(coin.volume.toFixed(2)),
+      coin.symbol
     );
   });
 
@@ -383,6 +388,7 @@ export default function CoinList() {
         width: "100%",
         maxWidth: "950px",
         margin: "auto",
+        marginTop: "2rem",
       }}
     >
       <Paper sx={{ width: "100%", mb: 2 }}>
@@ -435,10 +441,16 @@ export default function CoinList() {
                         scope="row"
                         padding="none"
                       >
-                        {row.name}
+                        <img src={row.icon} alt="Coin Icon" className="icon" />
+                        {` ${row.name} - ${row.symbol}`}
                       </TableCell>
                       <TableCell align="right">{row.priceChange1d}</TableCell>
-                      <TableCell align="right">{row.price}</TableCell>
+                      <TableCell align="right">
+                        {row.price.toLocaleString("de-DE", {
+                          style: "currency",
+                          currency: "EUR",
+                        })}
+                      </TableCell>
                       <TableCell align="right">{row.priceBtc}</TableCell>
                       <TableCell align="right">{row.marketCap}</TableCell>
                       <TableCell align="right">{row.volume}</TableCell>

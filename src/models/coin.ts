@@ -1,7 +1,7 @@
 export default interface Coin {
   // availableSupply: number;
   // exp: string[];
-  // icon: string;
+  icon: string;
   // id: string;
   marketCap: number;
   name: string;
@@ -11,7 +11,7 @@ export default interface Coin {
   // priceChange1h: number;
   // priceChange1w: number;
   // rank: number;
-  // symbol: string;
+  symbol: string;
   // totalSupply: number;
   // twitterUrl: string;
   volume: number;
