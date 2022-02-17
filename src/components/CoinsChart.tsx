@@ -1,5 +1,6 @@
+import * as React from "react";
 const CoinChart = () => {
-  return <div>Coind Chart</div>;
+  return <div>Coin Chart</div>;
 };
 
 export default CoinChart;
