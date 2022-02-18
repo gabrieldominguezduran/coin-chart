@@ -2,6 +2,7 @@ import Coin from "./coin";
 
 export default interface appContext {
   coins: Coin[];
-  // addCoin: (id: string) => void;
-  removeCoin: (name: string) => void;
+  addedCoins: Coin[];
+  addCoin: (names: string[]) => void;
+  removeCoin: (names: string[]) => void;
 }

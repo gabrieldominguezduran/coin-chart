@@ -3,8 +3,9 @@ import appContext from "../models/appContext";
 
 const CoinsContext = React.createContext<appContext>({
   coins: [],
-  // addCoin: () => {},
-  removeCoin: (name: string) => {},
+  addedCoins: [],
+  addCoin: (names: string[]) => {},
+  removeCoin: (names: string[]) => {},
 });
 
 export default CoinsContext;

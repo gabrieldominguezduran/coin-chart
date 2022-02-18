@@ -12,13 +12,14 @@ import appContext from "./models/appContext";
 
 function App() {
   const [coins, setCoins] = React.useState<Coin[]>([]);
+  const [addedCoins, setAddedCoins] = React.useState<Coin[]>([]);
   React.useEffect(() => {
     fetchCoins();
   }, []);
   const fetchCoins = async () => {
     try {
       const response = await fetch(
-        `https://api.coinstats.app/public/v1/coins?skip=0&limit=5&currency=EUR`
+        `https://api.coinstats.app/public/v1/coins?skip=0&limit=25&currency=EUR`
       );
       const data = await response.json();
       setCoins(data.coins);
@@ -27,14 +28,34 @@ function App() {
     }
   };
 
-  const handleRemoveCoin = (name: string) => {
-    setCoins((prevCoin) => {
-      return prevCoin.filter((coin) => coin.name !== name);
+  const handleAddCoin = (names: string[]) => {
+    names.map((name) => {
+      if (addedCoins.findIndex((coin) => coin.name === name) === -1) {
+        setAddedCoins((prevAddedCoins) => {
+          return [
+            ...prevAddedCoins,
+            ...coins.filter((coin) => coin.name === name),
+          ];
+        });
+      }
+    });
+  };
+
+  const handleRemoveCoin = (names: string[]) => {
+    names.map((name) => {
+      setCoins((prevCoin) => {
+        return prevCoin.filter((coin) => coin.name !== name);
+      });
+      setAddedCoins((prevCoin) => {
+        return prevCoin.filter((coin) => coin.name !== name);
+      });
     });
   };
 
   const appCtx: appContext = {
     coins: coins,
+    addedCoins: addedCoins,
+    addCoin: handleAddCoin,
     removeCoin: handleRemoveCoin,
   };
 

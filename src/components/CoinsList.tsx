@@ -1,23 +1,3 @@
-// import * as React from "react";
-// import CoinsContext from "../store/CoinsContext";
-
-// const CoinList = () => {
-//   const coins = React.useContext(CoinsContext);
-//   console.log(coins, "Coins");
-
-//   return (
-//     <div>
-//       <ul>
-//         {coins.map((coin) => {
-//           return <li key={coin.id}>{coin.name}</li>;
-//         })}
-//       </ul>
-//     </div>
-//   );
-// };
-
-// export default CoinList;
-
 import * as React from "react";
 import { alpha } from "@mui/material/styles";
 import Box from "@mui/material/Box";
@@ -108,10 +88,7 @@ function getComparator<Key extends keyof any>(
 
 // This method is created for cross-browser compatibility, if you don't
 // need to support IE11, you can use Array.prototype.sort() directly
-function stableSort<T>(
-  array: readonly T[],
-  comparator: (a: T, b: T) => number
-) {
+function stableSort<T>(array: T[], comparator: (a: T, b: T) => number) {
   const stabilizedThis = array.map((el, index) => [el, index] as [T, number]);
   stabilizedThis.sort((a, b) => {
     const order = comparator(a[0], b[0]);
@@ -130,7 +107,7 @@ interface HeadCell {
   numeric: boolean;
 }
 
-const headCells: readonly HeadCell[] = [
+const headCells: HeadCell[] = [
   {
     id: "name",
     numeric: false,
@@ -237,14 +214,13 @@ function EnhancedTableHead(props: EnhancedTableProps) {
 
 interface EnhancedTableToolbarProps {
   numSelected: number;
+  addRow: (names: string[]) => void;
+  deleteRow: (names: string[]) => void;
+  names: string[];
 }
 
-const handleDelete = (name: string): void => {
-  console.log(name);
-};
-
 const EnhancedTableToolbar = (props: EnhancedTableToolbarProps) => {
-  const { numSelected } = props;
+  const { numSelected, addRow, deleteRow, names } = props;
 
   return (
     <Toolbar
@@ -282,23 +258,17 @@ const EnhancedTableToolbar = (props: EnhancedTableToolbarProps) => {
       {numSelected > 0 ? (
         <>
           <Tooltip title="Add to chart">
-            <IconButton>
+            <IconButton onClick={addRow.bind(null, names)}>
               <AddCircleIcon />
             </IconButton>
           </Tooltip>
           <Tooltip title="Delete row">
-            <IconButton>
+            <IconButton onClick={deleteRow.bind(null, names)}>
               <DeleteIcon />
             </IconButton>
           </Tooltip>
         </>
-      ) : (
-        <Tooltip title="Filter list">
-          <IconButton>
-            <FilterListIcon />
-          </IconButton>
-        </Tooltip>
-      )}
+      ) : null}
     </Toolbar>
   );
 };
@@ -306,10 +276,10 @@ const EnhancedTableToolbar = (props: EnhancedTableToolbarProps) => {
 export default function CoinList() {
   const [order, setOrder] = React.useState<Order>("desc");
   const [orderBy, setOrderBy] = React.useState<keyof Coin>("price");
-  const [selected, setSelected] = React.useState<readonly string[]>([]);
+  const [selected, setSelected] = React.useState<string[]>([]);
   const [page, setPage] = React.useState(0);
   const [rowsPerPage, setRowsPerPage] = React.useState(5);
-  const { coins, removeCoin } = React.useContext(CoinsContext);
+  const { coins, addCoin, removeCoin } = React.useContext(CoinsContext);
 
   const rows = coins.map((coin) => {
     return createData(
@@ -344,7 +314,7 @@ export default function CoinList() {
 
   const handleClick = (event: React.MouseEvent<unknown>, name: string) => {
     const selectedIndex = selected.indexOf(name);
-    let newSelected: readonly string[] = [];
+    let newSelected: string[] = [];
 
     if (selectedIndex === -1) {
       newSelected = newSelected.concat(selected, name);
@@ -392,7 +362,12 @@ export default function CoinList() {
       }}
     >
       <Paper sx={{ width: "100%", mb: 2 }}>
-        <EnhancedTableToolbar numSelected={selected.length} />
+        <EnhancedTableToolbar
+          numSelected={selected.length}
+          addRow={addCoin}
+          deleteRow={removeCoin}
+          names={selected}
+        />
         <TableContainer>
           <Table
             sx={{ minWidth: 750 }}
