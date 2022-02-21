@@ -2,7 +2,7 @@ export default interface Coin {
   // availableSupply: number;
   // exp: string[];
   icon: string;
-  // id: string;
+  id: string;
   marketCap: number;
   name: string;
   price: number;

@@ -13,6 +13,7 @@ import appContext from "./models/appContext";
 function App() {
   const [coins, setCoins] = React.useState<Coin[]>([]);
   const [addedCoins, setAddedCoins] = React.useState<Coin[]>([]);
+
   React.useEffect(() => {
     fetchCoins();
   }, []);

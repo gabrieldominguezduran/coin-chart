@@ -17,16 +17,15 @@ import IconButton from "@mui/material/IconButton";
 import Tooltip from "@mui/material/Tooltip";
 import DeleteIcon from "@mui/icons-material/Delete";
 import AddCircleIcon from "@mui/icons-material/AddCircle";
-import FilterListIcon from "@mui/icons-material/FilterList";
 import { visuallyHidden } from "@mui/utils";
 import CoinsContext from "../store/CoinsContext";
 import Coin from "../models/coin";
-
+import { useNavigate } from "react-router";
 function createData(
   // availableSupply: number,
   // exp: string[],
   icon: string,
-  // id: string,
+  id: string,
   name: string,
   priceChange1d: number,
   price: number,
@@ -45,7 +44,7 @@ function createData(
     // availableSupply,
     // exp,
     icon,
-    // id,
+    id,
     name,
     priceChange1d,
     price,
@@ -217,10 +216,18 @@ interface EnhancedTableToolbarProps {
   addRow: (names: string[]) => void;
   deleteRow: (names: string[]) => void;
   names: string[];
+  setSelected: React.Dispatch<React.SetStateAction<string[]>>;
 }
 
 const EnhancedTableToolbar = (props: EnhancedTableToolbarProps) => {
-  const { numSelected, addRow, deleteRow, names } = props;
+  const { numSelected, addRow, deleteRow, names, setSelected } = props;
+  let navigate = useNavigate();
+
+  const handleSelected = (): void => {
+    addRow(names);
+    setSelected([]);
+    navigate("/chart");
+  };
 
   return (
     <Toolbar
@@ -258,7 +265,7 @@ const EnhancedTableToolbar = (props: EnhancedTableToolbarProps) => {
       {numSelected > 0 ? (
         <>
           <Tooltip title="Add to chart">
-            <IconButton onClick={addRow.bind(null, names)}>
+            <IconButton onClick={handleSelected}>
               <AddCircleIcon />
             </IconButton>
           </Tooltip>
@@ -284,6 +291,7 @@ export default function CoinList() {
   const rows = coins.map((coin) => {
     return createData(
       coin.icon,
+      coin.id,
       coin.name,
       coin.priceChange1d,
       Number(coin.price.toFixed(2)),
@@ -367,6 +375,7 @@ export default function CoinList() {
           addRow={addCoin}
           deleteRow={removeCoin}
           names={selected}
+          setSelected={setSelected}
         />
         <TableContainer>
           <Table
@@ -419,7 +428,14 @@ export default function CoinList() {
                         <img src={row.icon} alt="Coin Icon" className="icon" />
                         {` ${row.name} - ${row.symbol}`}
                       </TableCell>
-                      <TableCell align="right">{row.priceChange1d}</TableCell>
+                      <TableCell
+                        align="right"
+                        id={row.priceChange1d > 0 ? "priceUp" : "priceDown"}
+                      >
+                        {row.priceChange1d > 0
+                          ? `+${row.priceChange1d}`
+                          : row.priceChange1d}
+                      </TableCell>
                       <TableCell align="right">
                         {row.price.toLocaleString("de-DE", {
                           style: "currency",
