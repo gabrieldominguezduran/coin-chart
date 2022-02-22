@@ -6,6 +6,7 @@ const CoinsContext = React.createContext<appContext>({
   addedCoins: [],
   addCoin: (names: string[]) => {},
   removeCoin: (names: string[]) => {},
+  removeAddedCoin: (id: string) => {},
 });
 
 export default CoinsContext;

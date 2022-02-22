@@ -5,4 +5,5 @@ export default interface appContext {
   addedCoins: Coin[];
   addCoin: (names: string[]) => void;
   removeCoin: (names: string[]) => void;
+  removeAddedCoin: (id: string) => void;
 }

@@ -53,11 +53,18 @@ function App() {
     });
   };
 
+  const handleRemoveAddedCoins = (id: string) => {
+    setAddedCoins((prevCoin) => {
+      return prevCoin.filter((coin) => coin.id !== id);
+    });
+  };
+
   const appCtx: appContext = {
     coins: coins,
     addedCoins: addedCoins,
     addCoin: handleAddCoin,
     removeCoin: handleRemoveCoin,
+    removeAddedCoin: handleRemoveAddedCoins,
   };
 
   return (

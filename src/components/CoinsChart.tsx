@@ -14,7 +14,8 @@ import { Line } from "react-chartjs-2";
 import CoinsContext from "../store/CoinsContext";
 import { ButtonGroup } from "@mui/material";
 import { Button } from "@material-ui/core";
-import { setLabels } from "react-chartjs-2/dist/utils";
+import DeleteIcon from "@mui/icons-material/Delete";
+import Tool from "@mui/material/Tooltip";
 
 ChartJS.register(
   CategoryScale,
@@ -26,32 +27,53 @@ ChartJS.register(
   Legend
 );
 
+interface chartObj {
+  id: string;
+  charts: [];
+}
+
 const CoinChart = () => {
-  const { addedCoins } = React.useContext(CoinsContext);
-  const [chartData, setChartData] = React.useState([]);
+  const { addedCoins, removeAddedCoin } = React.useContext(CoinsContext);
+  const [charts, setCharts] = React.useState<chartObj[]>([]);
   const [addLabels, setAddLabels] = React.useState<string[]>([]);
   const [hasPeriod, setHasPeriod] = React.useState<string>("24h");
-  console.log(addedCoins, "ADD");
 
   React.useEffect(() => {
     if (addedCoins && addedCoins.length > 0) {
       addedCoins.forEach((coin) => fetchChart(hasPeriod, coin.id));
+    }
+  }, [addedCoins]);
+
+  React.useEffect(() => {
+    if (hasPeriod === "24h") {
       setAddLabels(labelsDay);
+    }
+    if (hasPeriod === "1w") {
+      setAddLabels(labelsWeek);
+    }
+    if (hasPeriod === "1m") {
+      setAddLabels(labelsMonth);
     }
   }, [hasPeriod]);
 
-  const fetchChart = async (period: string = "24h", id: string) => {
-    try {
-      const response = await fetch(
-        `https://api.coinstats.app/public/v1/charts?period=${period}&coinId=${id}`
-      );
-      const data = await response.json();
-      setChartData(data.chart);
-    } catch (error) {
-      console.log("error", error);
+  const fetchChart = async (period: string, id: string) => {
+    period = period === "" ? "24h" : period;
+    if (charts.findIndex((chart) => chart.id === id) === -1) {
+      try {
+        const response = await fetch(
+          `https://api.coinstats.app/public/v1/charts?period=${period}&coinId=${id}`
+        );
+
+        const data = await response.json();
+
+        setCharts((prevCharts): chartObj[] => {
+          return [...prevCharts, { id: id, charts: data.chart }];
+        });
+      } catch (error) {
+        console.log("error", error);
+      }
     }
   };
-  console.log(chartData, "CHART");
 
   const options = {
     responsive: true,
@@ -66,19 +88,23 @@ const CoinChart = () => {
     },
   };
 
-  const handleSetLables = (label: string) => {
-    if (label === "day") {
-      setAddLabels(labelsDay);
+  const handleSetLables = (period: string) => {
+    if (period === "day") {
       setHasPeriod("24h");
     }
-    if (label === "week") {
-      setAddLabels(labelsWeek);
+    if (period === "week") {
       setHasPeriod("1w");
     }
-    if (label === "month") {
-      setAddLabels(labelsMonth);
+    if (period === "month") {
       setHasPeriod("1m");
     }
+  };
+
+  const removeFromChart = (id: string) => {
+    removeAddedCoin(id);
+    setCharts((prevChart) => {
+      return prevChart.filter((chart) => chart.id !== id);
+    });
   };
 
   const labelsDay = [
@@ -150,18 +176,45 @@ const CoinChart = () => {
     "Sunday",
   ];
 
+  let sets = charts.map((chart, i) => {
+    let borColor = [
+      "rgb(255, 99, 132)",
+      "rgb(244, 244, 11)",
+      "rgb(76, 244, 11)",
+      "rgb(11, 124, 244 )",
+      "rgb(244, 11, 234 )",
+    ];
+    let bacColor = [
+      "rgba(255, 99, 132, 0.5)",
+      "rgba(244, 244, 11, 0.5)",
+      "rgba(76, 244, 11, 0.5)",
+      "rgba(11, 124, 244, 0.5)",
+      "rgba(244, 11, 234, 0.5)",
+    ];
+
+    return {
+      label: chart.id,
+      data: chart.charts.map((chart) => chart[1]),
+      borderColor: borColor[i],
+      backgroundColor: bacColor[i],
+    };
+  });
+
   const labels = addLabels;
 
   const data = {
     labels,
-    datasets: [
-      {
-        label: addedCoins[0] ? addedCoins[0].name : "None added",
-        data: chartData.map((coin) => coin[1]),
-        borderColor: "rgb(255, 99, 132)",
-        backgroundColor: "rgba(255, 99, 132, 0.5)",
-      },
-    ],
+    datasets:
+      sets && sets.length > 0
+        ? sets
+        : [
+            {
+              label: "",
+              data: [],
+              borderColor: "",
+              backgroundColor: "",
+            },
+          ],
   };
   return (
     <div className="chart-container">
@@ -175,6 +228,21 @@ const CoinChart = () => {
         <Button onClick={() => handleSetLables("week")}>WEEK</Button>
         <Button onClick={() => handleSetLables("month")}>MONTH</Button>
       </ButtonGroup>
+      <div className="chart-icons">
+        {addedCoins.map((coin) => {
+          return (
+            <span key={coin.id} className="chart">
+              <DeleteIcon
+                onClick={() => removeFromChart(coin.id)}
+                sx={{ width: "20px", height: "20px", cursor: "pointer" }}
+              />
+              <Tool title={coin.name}>
+                <img src={coin.icon} alt="Coin Icon" className="chart__icon" />
+              </Tool>
+            </span>
+          );
+        })}
+      </div>
     </div>
   );
 };
