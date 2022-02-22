@@ -30,7 +30,10 @@ body {
 }
 
 .icon {
-  display: none;
+  display: inline;
+  height: 30px;
+  width: 30px;
+  margin-top: 10px;
 }
 
 .chart-container {
