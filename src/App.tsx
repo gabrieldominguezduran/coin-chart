@@ -3,7 +3,7 @@ import "./App.css";
 
 import CoinList from "./components/CoinsList";
 import CoinChart from "./components/CoinsChart";
-import { BrowserRouter, Route, Routes } from "react-router-dom";
+import { HashRouter, Route, Routes } from "react-router-dom";
 import SideNav from "./components/SideNav";
 
 import Coin from "./models/coin";
@@ -69,13 +69,13 @@ function App() {
 
   return (
     <CoinsContext.Provider value={appCtx}>
-      <BrowserRouter>
+      <HashRouter basename="/">
         <SideNav />
         <Routes>
           <Route path="/" element={<CoinList />} />
           <Route path="chart" element={<CoinChart />} />
         </Routes>
-      </BrowserRouter>
+      </HashRouter>
     </CoinsContext.Provider>
   );
 }
