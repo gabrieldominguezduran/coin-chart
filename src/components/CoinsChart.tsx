@@ -16,6 +16,7 @@ import { ButtonGroup } from "@mui/material";
 import { Button } from "@material-ui/core";
 import DeleteIcon from "@mui/icons-material/Delete";
 import Tool from "@mui/material/Tooltip";
+import ColorModeContext from "../store/ColorModeContext";
 
 ChartJS.register(
   CategoryScale,
@@ -37,6 +38,7 @@ const CoinChart = () => {
   const [charts, setCharts] = React.useState<chartObj[]>([]);
   const [addLabels, setAddLabels] = React.useState<string[]>([]);
   const [hasPeriod, setHasPeriod] = React.useState<string>("24h");
+  const { mode } = React.useContext(ColorModeContext);
 
   React.useEffect(() => {
     if (addedCoins && addedCoins.length > 0) {
@@ -74,17 +76,37 @@ const CoinChart = () => {
       }
     }
   };
-
+  const fontColor = mode === "light" ? "black" : "white";
+  const tooltipColor =
+    mode === "light" ? "rgba(0, 0, 0, 0.9)" : "rgba(106, 104, 104, 0.9)";
   const options = {
+    scales: {
+      y: {
+        grid: {
+          color: "lightgray",
+        },
+        labels: {
+          color: "lightgray",
+        },
+      },
+      x: {
+        grid: {
+          color: "lightgray",
+        },
+      },
+    },
     responsive: true,
     plugins: {
+      tooltip: {
+        backgroundColor: tooltipColor,
+      },
       legend: {
         position: "top" as const,
       },
       title: {
         display: true,
         text: "Coin's Chart",
-        color: "white",
+        color: fontColor,
       },
     },
   };
