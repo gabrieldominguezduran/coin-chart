@@ -1,6 +1,6 @@
 import * as React from "react";
 import "./App.css";
-
+import { useTheme, ThemeProvider, createTheme } from "@mui/material/styles";
 import CoinList from "./components/CoinsList";
 import CoinChart from "./components/CoinsChart";
 import { HashRouter, Route, Routes } from "react-router-dom";
@@ -9,10 +9,32 @@ import SideNav from "./components/SideNav";
 import Coin from "./models/coin";
 import CoinsContext from "./store/CoinsContext";
 import appContext from "./models/appContext";
+import ColorModeContext from "./store/ColorModeContext";
 
 function App() {
   const [coins, setCoins] = React.useState<Coin[]>([]);
   const [addedCoins, setAddedCoins] = React.useState<Coin[]>([]);
+  const [mode, setMode] = React.useState<"light" | "dark">("light");
+
+  const colorMode = React.useMemo(
+    () => ({
+      toggleColorMode: () => {
+        setMode((prevMode) => (prevMode === "light" ? "dark" : "light"));
+      },
+      mode,
+    }),
+    [mode]
+  );
+
+  const theme = React.useMemo(
+    () =>
+      createTheme({
+        palette: {
+          mode,
+        },
+      }),
+    [mode]
+  );
 
   React.useEffect(() => {
     fetchCoins();
@@ -68,15 +90,19 @@ function App() {
   };
 
   return (
-    <CoinsContext.Provider value={appCtx}>
-      <HashRouter basename="/">
-        <SideNav />
-        <Routes>
-          <Route path="/" element={<CoinList />} />
-          <Route path="chart" element={<CoinChart />} />
-        </Routes>
-      </HashRouter>
-    </CoinsContext.Provider>
+    <ColorModeContext.Provider value={colorMode}>
+      <ThemeProvider theme={theme}>
+        <CoinsContext.Provider value={appCtx}>
+          <HashRouter basename="/">
+            <SideNav />
+            <Routes>
+              <Route path="/" element={<CoinList />} />
+              <Route path="chart" element={<CoinChart />} />
+            </Routes>
+          </HashRouter>
+        </CoinsContext.Provider>
+      </ThemeProvider>
+    </ColorModeContext.Provider>
   );
 }
 

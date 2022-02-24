@@ -17,7 +17,11 @@ import ListItem from "@mui/material/ListItem";
 import ListItemText from "@mui/material/ListItemText";
 import BackupTableIcon from "@mui/icons-material/BackupTable";
 import SsidChartIcon from "@mui/icons-material/SsidChart";
-import LanguageIcon from "@mui/icons-material/Language";
+
+import Brightness4Icon from "@mui/icons-material/Brightness4";
+import Brightness7Icon from "@mui/icons-material/Brightness7";
+import ColorModeContext from "../store/ColorModeContext";
+import Tooltip from "@mui/material/Tooltip";
 
 const drawerWidth = 240;
 
@@ -52,9 +56,9 @@ const DrawerHeader = styled("div")(({ theme }) => ({
 }));
 
 export default function PersistentDrawerLeft() {
-  const label = { inputProps: { "aria-label": "Switch theme color" } };
   const theme = useTheme();
   const [open, setOpen] = React.useState(false);
+  const colorMode = React.useContext(ColorModeContext);
 
   const handleDrawerOpen = () => {
     setOpen(true);
@@ -81,7 +85,20 @@ export default function PersistentDrawerLeft() {
           <Typography variant="h4" noWrap component="div">
             Coin's Charts
           </Typography>
-          <LanguageIcon />
+          <Tooltip title="Switch theme color">
+            <IconButton
+              sx={{ ml: 1 }}
+              onClick={colorMode.toggleColorMode}
+              color="inherit"
+              aria-labelledby="Switch theme color"
+            >
+              {theme.palette.mode === "dark" ? (
+                <Brightness7Icon />
+              ) : (
+                <Brightness4Icon />
+              )}
+            </IconButton>
+          </Tooltip>
         </Toolbar>
       </AppBar>
       <Drawer

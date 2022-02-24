@@ -84,6 +84,7 @@ const CoinChart = () => {
       title: {
         display: true,
         text: "Coin's Chart",
+        color: "white",
       },
     },
   };
@@ -220,7 +221,13 @@ const CoinChart = () => {
     <div className="chart-container">
       <Line options={options} data={data} />
       <ButtonGroup
-        sx={{ display: "flex", justifyContent: "center" }}
+        sx={{
+          display: "flex",
+          justifyContent: "center",
+          backgroundColor: "white",
+          width: "fit-content",
+          margin: "auto",
+        }}
         variant="text"
         aria-label="text button group"
       >
